@@ -1,26 +1,893 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="color-scheme" content="light"><title>Rillprobe · Contract report</title>
-<style>
-:root{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#172d43;background:#f3f5f7;font-synthesis:none;--muted:#526477;--line:#dbe2e9;--blue:#0757b8;--green:#196144;--red:#a32e3c}
-*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 80% 0,#dfedf9 0,transparent 52%),#f3f5f7;font-size:15px;line-height:1.55}button,a{touch-action:manipulation}button,select{font:inherit}a{color:var(--blue)}:focus-visible{outline:3px solid #1264c1;outline-offset:4px}.shell{max-width:1240px;margin:auto;padding:28px 40px 64px}.top{display:flex;align-items:center;justify-content:space-between;gap:20px;margin-bottom:58px}.brand{display:flex;gap:12px;align-items:center;font-size:20px;letter-spacing:-.6px;font-weight:650}.brand svg{width:38px;height:38px}.badge{font-size:11px;letter-spacing:.08em;text-transform:uppercase;border:1px solid #c9d7e4;border-radius:100px;padding:5px 10px;background:#edf3f8;color:#38556f}.top a{text-decoration:none;font-size:13px;color:var(--muted)}.eyebrow{font-size:11px;letter-spacing:.13em;text-transform:uppercase;font-weight:650;color:var(--muted);margin:0 0 12px}h1{font-size:clamp(32px,4.5vw,52px);font-weight:550;line-height:1.12;letter-spacing:-2px;margin:0 0 18px;max-width:780px}.intro{color:var(--muted);max-width:640px;margin:0;font-size:16px}.hero{display:flex;justify-content:space-between;gap:32px;align-items:flex-end;margin-bottom:34px}.run-status{display:flex;align-items:center;gap:9px;font-size:13px;white-space:nowrap;background:#fff;border:1px solid var(--line);border-radius:30px;padding:10px 15px}.dot{width:7px;height:7px;border-radius:50%;background:var(--red)}.dot.ok{background:var(--green)}.metrics{display:grid;grid-template-columns:repeat(4,1fr);background:#fff;border:1px solid var(--line);border-radius:18px;overflow:hidden;margin:30px 0 24px;box-shadow:0 5px 24px #1c355006}.metric{padding:22px 26px;border-right:1px solid var(--line)}.metric:last-child{border:0}.metric strong{display:block;font-size:30px;font-weight:550;line-height:1.2;letter-spacing:-1px;margin-bottom:6px}.metric span{color:var(--muted);font-size:12px}.metric.red strong{color:var(--red)}.workspace{display:grid;grid-template-columns:1fr 350px;gap:22px;align-items:start}.panel{border:1px solid var(--line);border-radius:18px;background:#fff;overflow:hidden;min-width:0;box-shadow:0 8px 30px #172d4305}.toolbar{display:flex;gap:12px;align-items:center;justify-content:space-between;padding:16px 20px;background:#f6f9fc;border-bottom:1px solid var(--line)}@supports(backdrop-filter:blur(20px)){.toolbar{background:#e9f0f7c9;backdrop-filter:blur(20px)}}.toolbar h2{font-size:14px;font-weight:600;margin:0}.segmented{display:flex;gap:3px;background:#fff;border:1px solid #ccd7e1;border-radius:9px;padding:3px}.segmented button{border:0;background:transparent;padding:5px 10px;border-radius:5px;font-size:12px;color:var(--muted);cursor:pointer}.segmented button[aria-pressed=true]{background:#e4eefb;color:#164b89}.row{width:100%;display:grid;grid-template-columns:22px 1fr auto;align-items:center;gap:10px;border:0;border-bottom:1px solid #e8edf2;padding:16px 20px;text-align:left;background:white;color:inherit;cursor:pointer}.row:hover{background:#f5f8fc}.row[aria-pressed=true]{background:#edf4fc;box-shadow:inset 3px 0 var(--blue)}.row:last-child{border-bottom:0}.row .name{display:block;font-size:13px;font-weight:600;overflow-wrap:anywhere}.row .sub{font-size:11px;color:var(--muted)}.state{font-size:11px;color:var(--green);font-weight:600}.state.fail{color:var(--red)}.symbol{font-size:15px;color:var(--green)}.symbol.fail{color:var(--red)}.detail{padding:22px}.detail h2{font-size:18px;letter-spacing:-.4px;line-height:1.35;margin:0 0 10px}.detail p{font-size:12px;color:var(--muted);margin:8px 0 20px}.detail h3{font-size:10px;text-transform:uppercase;letter-spacing:.09em;margin:22px 0 9px;color:var(--muted)}pre{font-family:"SFMono-Regular",Consolas,monospace;font-size:11px;line-height:1.7;white-space:pre-wrap;overflow-wrap:anywhere;background:#f4f7fa;border:1px solid #e1e7ed;border-radius:9px;padding:12px;margin:0;color:#233e58}.route{display:flex;gap:8px;align-items:center;font-size:11px}.route span{padding:5px 9px;border:1px solid var(--line);border-radius:6px}.route .bad{color:var(--red);background:#fff2f3;border-color:#efcbd0}.note{padding:18px 22px;font-size:12px;color:var(--muted);border-top:1px solid var(--line);background:#fafcfe}.empty{padding:30px;color:var(--muted)}.foot{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:22px}.info{padding:24px}.info h2{font-size:13px;margin:0 0 12px;font-weight:600}.info p,.info dl{font-size:12px;color:var(--muted);margin:0}.info dt{float:left;clear:left;min-width:82px}.info dd{margin-left:90px;overflow-wrap:anywhere}.footer{display:flex;justify-content:space-between;gap:25px;margin-top:30px;font-size:11px;color:var(--muted)}.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}.load{display:none;margin-bottom:24px;padding:14px 18px;border:1px solid var(--line);border-radius:12px;background:#fff;font-size:13px}.load label{display:block;margin-bottom:8px;font-weight:600}.load input{max-width:100%}@media(max-width:950px){.workspace{grid-template-columns:1fr 310px}.shell{padding:24px}.metric{padding:18px}.hero{display:block}.run-status{display:inline-flex;margin-top:24px}}@media(max-width:720px){.workspace,.foot{grid-template-columns:1fr}.shell{padding:20px 16px 36px}.top{margin-bottom:36px}.top a{display:none}.hero{margin-bottom:24px}h1{letter-spacing:-1.4px}.metrics{grid-template-columns:1fr 1fr}.metric:nth-child(2){border-right:0}.metric:nth-child(-n+2){border-bottom:1px solid var(--line)}.metric{padding:18px 20px}.toolbar{flex-wrap:wrap;gap:10px}.row{padding:15px 16px}.footer{flex-direction:column;gap:8px}}@media(prefers-reduced-transparency:reduce){.toolbar{background:#edf2f7;backdrop-filter:none}}@media(prefers-contrast:more){:root{--muted:#243c53;--line:#7a8d9f}.toolbar{background:#e9eff5;backdrop-filter:none}}@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;animation:none!important;transition:none!important}}@media print{.segmented,.load,.top a{display:none}.workspace{grid-template-columns:1fr}.shell{max-width:none;padding:0}.panel{box-shadow:none}.row{break-inside:avoid}}
-#rows{max-height:620px;overflow-y:auto}.detail{position:sticky;top:20px}.detail pre{max-height:280px;overflow:auto}.back{display:none}@media(max-width:720px){.detail{position:static}.back{display:block;border:1px solid var(--line);border-radius:7px;background:#fff;padding:7px 10px;margin-bottom:20px;color:var(--blue)}#rows{max-height:440px}}</style></head><body><main class="shell"><header class="top"><div class="brand">__LOGO__<span>rillprobe</span></div><span class="badge" id="mode">Contract report</span><a href="https://github.com/bglglzd/rillprobe">Source & documentation ↗</a></header>
-<div class="load" id="load"><label for="report-file">View the saved synthetic sample, or open your own JSON report</label><input id="report-file" type="file" accept="application/json,.json"><p id="load-status" role="status">Your file stays in this browser. Run the CLI to generate fresh evidence.</p></div>
-<section class="hero"><div><p class="eyebrow">AI gateway contract testing</p><h1 id="headline">Find the break.<br>Keep the evidence.</h1><p class="intro" id="intro">Compare the direct route with the gateway. Inspect the first divergence, then reproduce the case.</p></div><div class="run-status"><span class="dot" id="dot"></span><span id="status">Loading report</span></div></section>
-<section class="metrics" aria-label="Run summary"><div class="metric"><strong id="fixtures">—</strong><span id="fixtures-label">named fixtures</span></div><div class="metric"><strong id="passed">—</strong><span>checks passed</span></div><div class="metric red"><strong id="failed">—</strong><span>contract failures</span></div><div class="metric"><strong id="duration">—</strong><span id="duration-label">elapsed · seconds</span></div></section>
-<div class="workspace"><section class="panel" aria-labelledby="results-title"><div class="toolbar"><h2 id="results-title">Route comparison</h2><div class="segmented" role="group" aria-label="Filter checks"><button data-filter="fail" aria-pressed="true">Failures</button><button data-filter="all" aria-pressed="false">All checks</button><button data-filter="pass" aria-pressed="false">Passed</button></div></div><div id="rows"></div><div class="note" id="explanation"></div></section><aside class="panel detail" id="detail" aria-label="Selected check" tabindex="-1"></aside></div>
-<div class="foot"><section class="panel info"><h2>Execution record</h2><dl id="environment"></dl></section><section class="panel info"><h2>Transport ≠ retrieval quality</h2><p id="quality"></p></section></div><footer class="footer"><span>Evidence over assumptions.</span><span id="timestamp"></span></footer></main>
-<script id="report-data" type="application/json">__REPORT_DATA__</script><script>
-'use strict';
-let report=JSON.parse(document.getElementById('report-data').textContent),filter='fail',selected=null;
-const $=id=>document.getElementById(id),pretty=x=>JSON.stringify(x,null,2);
-function text(tag,value,cls){const el=document.createElement(tag);el.textContent=String(value??'');if(cls)el.className=cls;return el}
-function block(title,value){$('detail').append(text('h3',title),text('pre',typeof value==='string'?value:pretty(value)))}
-function select(row,fromUser=false){selected=row;renderRows();const d=$('detail');d.replaceChildren();const back=text('button','← Back to checks','back');back.type='button';back.onclick=()=>{const b=[...$('rows').children].find(x=>x.dataset.key===row.case_id+'|'+row.route+'|'+(row.iteration??''));if(b){b.focus();b.scrollIntoView({block:'center'})}};d.append(back,text('p',row.status==='fail'?'FIRST DIVERGENCE':'CHECK DETAILS','eyebrow'),text('h2',row.code==='ok'?row.case_id:row.code.replaceAll('_',' ')));d.append(text('p',row.case_id+' · '+row.route));const route=text('div','','route');route.append(text('span',row.route==='live'?'Live endpoint':'Direct provider'),text('b','→'),text('span',row.route==='gateway'?'Gateway':row.status==='pass'?'Verified':'Observed',row.status==='fail'?'bad':''));d.append(route);block('Expected invariant',row.expected);block('Actual result',row.actual);if(row.input)block('Synthetic input',row.input);block('Reproduce',row.reproduce);if(row.seed)block('Injected defect',row.seed);if(fromUser&&matchMedia('(max-width:720px)').matches){d.focus({preventScroll:true});d.scrollIntoView({block:'start'})}}
-function renderRows(){const holder=$('rows'),focusKey=document.activeElement?.dataset.key,scroll=holder.scrollTop;holder.replaceChildren();const list=report.rows.filter(r=>filter==='all'||r.status===filter);if(!list.length)holder.append(text('p','No checks in this filter. Choose All checks to see the run.','empty'));for(const row of list){const b=document.createElement('button');b.type='button';b.className='row';b.dataset.key=row.case_id+'|'+row.route+'|'+(row.iteration??'');b.setAttribute('aria-pressed',String(selected===row));b.append(text('span',row.status==='fail'?'×':'✓','symbol '+row.status));const name=text('span','');name.append(text('span',row.case_id,'name'),text('span',row.route+' · '+row.code,'sub'));b.append(name,text('span',row.status==='fail'?'Failed':row.expected_rejection?'Rejected ✓':'Passed','state '+row.status));b.onclick=()=>select(row,true);holder.append(b);if(focusKey===b.dataset.key)b.focus({preventScroll:true})}holder.scrollTop=scroll}
-function render(){const s=report.summary,live=report.mode==='live';$('mode').textContent=live?'Live execution':'Synthetic HTTP demo';$('status').textContent=s.failed?s.failed+' contract failures':'All checked contracts passed';$('dot').className='dot'+(s.failed?'':' ok');$('headline').textContent=s.failed?'Find the break. Keep the evidence.':'Same contract. Clear passage.';$('fixtures').textContent=report.fixture_count??s.checks;$('fixtures-label').textContent=live?'live requests':'named fixtures';$('passed').textContent=s.passed;$('failed').textContent=s.failed;$('duration').textContent=((s.duration_ms??report.rows.reduce((n,r)=>n+r.duration_ms,0))/1000).toFixed(2);$('explanation').textContent=live?report.limits.join(' '):report.scenario==='seeded-faults'?s.detected_defects+' of '+s.seeded_defects+' injected defects detected. Direct provider is the control. This demo performs no model inference.':'The repaired synthetic gateway preserves the checked contracts. This demo performs no model inference.';if(live)$('intro').textContent='Observed endpoint behavior. A successful transport check does not certify model quality or untested capabilities.';const env=$('environment');env.replaceChildren();for(const [k,v]of Object.entries({...report.environment,...(report.configuration??{})})){env.append(text('dt',k),text('dd',v))}const q=report.quality;$('quality').textContent=q?'Synthetic lexical baseline · '+q.queries+' queries / '+q.documents+' documents. MRR '+q.mean_mrr.toFixed(3)+' · nDCG '+q.mean_ndcg.toFixed(3)+'. '+q.note:'No text-equality comparison or model leaderboard. Rerank quality, when selected, uses authored relevance labels and original document positions.';$('timestamp').textContent=report.environment.timestamp;filter=s.failed?'fail':'all';document.querySelectorAll('[data-filter]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===filter)));select(report.rows.find(r=>r.status==='fail')??report.rows[0])}
-document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>x.setAttribute('aria-pressed',String(x===b)));const first=report.rows.find(r=>filter==='all'||r.status===filter);if(first)select(first);else{selected=null;renderRows();$('detail').replaceChildren(text('h2','No checks in this filter'),text('p','Choose All checks to inspect the run.'))}});
-if(location.pathname.endsWith('index.html')||location.pathname.endsWith('/')){$('load').style.display='block'}
-$('report-file').onchange=async e=>{const previous=report;try{const file=e.target.files[0];if(!file)return;if(file.size>16*1024*1024)throw Error('Report is larger than 16 MiB.');const candidate=JSON.parse(await file.text());const valid=candidate.schema_version===1&&['synthetic','live'].includes(candidate.mode)&&Array.isArray(candidate.rows)&&candidate.rows.length>0&&candidate.rows.length<=2000&&candidate.summary&&candidate.environment&&typeof candidate.environment.timestamp==='string'&&candidate.rows.every(r=>['pass','fail'].includes(r.status)&&['case_id','route','code','expected','reproduce'].every(k=>typeof r[k]==='string')&&Number.isFinite(r.duration_ms)&&Object.hasOwn(r,'actual'));if(!valid||candidate.summary.checks!==candidate.rows.length||candidate.summary.passed!==candidate.rows.filter(r=>r.status==='pass').length||candidate.summary.failed!==candidate.rows.filter(r=>r.status==='fail').length)throw Error('Choose a Rillprobe v1 report with consistent result rows (maximum 2,000).');report=candidate;render();$('load-status').textContent='Loaded '+file.name+'. The file stays in this browser.'}catch(error){report=previous;render();$('load-status').textContent='Could not load report: '+error.message}};
-render();
-</script></body></html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="light" />
+    <title>Rillprobe · Contract report</title>
+    <style>
+      :root {
+        font-family:
+          Inter,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+        color: #172d43;
+        background: #f3f5f7;
+        font-synthesis: none;
+        --muted: #526477;
+        --line: #dbe2e9;
+        --blue: #0757b8;
+        --green: #196144;
+        --red: #a32e3c;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background:
+          radial-gradient(ellipse at 80% 0, #dfedf9 0, transparent 52%), #f3f5f7;
+        font-size: 15px;
+        line-height: 1.55;
+      }
+      button,
+      a {
+        touch-action: manipulation;
+      }
+      button,
+      select {
+        font: inherit;
+      }
+      a {
+        color: var(--blue);
+      }
+      :focus-visible {
+        outline: 3px solid #1264c1;
+        outline-offset: 4px;
+      }
+      .shell {
+        max-width: 1240px;
+        margin: auto;
+        padding: 28px 40px 64px;
+      }
+      .top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 20px;
+        margin-bottom: 58px;
+      }
+      .brand {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        font-size: 20px;
+        letter-spacing: -0.6px;
+        font-weight: 650;
+      }
+      .brand svg {
+        width: 38px;
+        height: 38px;
+      }
+      .badge {
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: 1px solid #c9d7e4;
+        border-radius: 100px;
+        padding: 5px 10px;
+        background: #edf3f8;
+        color: #38556f;
+      }
+      .top a {
+        text-decoration: none;
+        font-size: 13px;
+        color: var(--muted);
+      }
+      .eyebrow {
+        font-size: 11px;
+        letter-spacing: 0.13em;
+        text-transform: uppercase;
+        font-weight: 650;
+        color: var(--muted);
+        margin: 0 0 12px;
+      }
+      h1 {
+        font-size: clamp(32px, 4.5vw, 52px);
+        font-weight: 550;
+        line-height: 1.12;
+        letter-spacing: -2px;
+        margin: 0 0 18px;
+        max-width: 780px;
+      }
+      .intro {
+        color: var(--muted);
+        max-width: 640px;
+        margin: 0;
+        font-size: 16px;
+      }
+      .hero {
+        display: flex;
+        justify-content: space-between;
+        gap: 32px;
+        align-items: flex-end;
+        margin-bottom: 34px;
+      }
+      .run-status {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        font-size: 13px;
+        white-space: nowrap;
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 30px;
+        padding: 10px 15px;
+      }
+      .dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--red);
+      }
+      .dot.ok {
+        background: var(--green);
+      }
+      .metrics {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        background: #fff;
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        overflow: hidden;
+        margin: 30px 0 24px;
+        box-shadow: 0 5px 24px #1c355006;
+      }
+      .metric {
+        padding: 22px 26px;
+        border-right: 1px solid var(--line);
+      }
+      .metric:last-child {
+        border: 0;
+      }
+      .metric strong {
+        display: block;
+        font-size: 30px;
+        font-weight: 550;
+        line-height: 1.2;
+        letter-spacing: -1px;
+        margin-bottom: 6px;
+      }
+      .metric span {
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .metric.red strong {
+        color: var(--red);
+      }
+      .workspace {
+        display: grid;
+        grid-template-columns: 1fr 350px;
+        gap: 22px;
+        align-items: start;
+      }
+      .panel {
+        border: 1px solid var(--line);
+        border-radius: 18px;
+        background: #fff;
+        overflow: hidden;
+        min-width: 0;
+        box-shadow: 0 8px 30px #172d4305;
+      }
+      .toolbar {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        justify-content: space-between;
+        padding: 16px 20px;
+        background: #f6f9fc;
+        border-bottom: 1px solid var(--line);
+      }
+      @supports (backdrop-filter: blur(20px)) {
+        .toolbar {
+          background: #e9f0f7c9;
+          backdrop-filter: blur(20px);
+        }
+      }
+      .toolbar h2 {
+        font-size: 14px;
+        font-weight: 600;
+        margin: 0;
+      }
+      .segmented {
+        display: flex;
+        gap: 3px;
+        background: #fff;
+        border: 1px solid #ccd7e1;
+        border-radius: 9px;
+        padding: 3px;
+      }
+      .segmented button {
+        border: 0;
+        background: transparent;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .segmented button[aria-pressed="true"] {
+        background: #e4eefb;
+        color: #164b89;
+      }
+      .row {
+        width: 100%;
+        display: grid;
+        grid-template-columns: 22px 1fr auto;
+        align-items: center;
+        gap: 10px;
+        border: 0;
+        border-bottom: 1px solid #e8edf2;
+        padding: 16px 20px;
+        text-align: left;
+        background: white;
+        color: inherit;
+        cursor: pointer;
+      }
+      .row:hover {
+        background: #f5f8fc;
+      }
+      .row[aria-pressed="true"] {
+        background: #edf4fc;
+        box-shadow: inset 3px 0 var(--blue);
+      }
+      .row:last-child {
+        border-bottom: 0;
+      }
+      .row .name {
+        display: block;
+        font-size: 13px;
+        font-weight: 600;
+        overflow-wrap: anywhere;
+      }
+      .row .sub {
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .state {
+        font-size: 11px;
+        color: var(--green);
+        font-weight: 600;
+      }
+      .state.fail {
+        color: var(--red);
+      }
+      .symbol {
+        font-size: 15px;
+        color: var(--green);
+      }
+      .symbol.fail {
+        color: var(--red);
+      }
+      .detail {
+        padding: 22px;
+      }
+      .detail h2 {
+        font-size: 18px;
+        letter-spacing: -0.4px;
+        line-height: 1.35;
+        margin: 0 0 10px;
+      }
+      .detail p {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 8px 0 20px;
+      }
+      .detail h3 {
+        font-size: 10px;
+        text-transform: uppercase;
+        letter-spacing: 0.09em;
+        margin: 22px 0 9px;
+        color: var(--muted);
+      }
+      pre {
+        font-family: "SFMono-Regular", Consolas, monospace;
+        font-size: 11px;
+        line-height: 1.7;
+        white-space: pre-wrap;
+        overflow-wrap: anywhere;
+        background: #f4f7fa;
+        border: 1px solid #e1e7ed;
+        border-radius: 9px;
+        padding: 12px;
+        margin: 0;
+        color: #233e58;
+      }
+      .route {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+        font-size: 11px;
+      }
+      .route span {
+        padding: 5px 9px;
+        border: 1px solid var(--line);
+        border-radius: 6px;
+      }
+      .route .bad {
+        color: var(--red);
+        background: #fff2f3;
+        border-color: #efcbd0;
+      }
+      .note {
+        padding: 18px 22px;
+        font-size: 12px;
+        color: var(--muted);
+        border-top: 1px solid var(--line);
+        background: #fafcfe;
+      }
+      .empty {
+        padding: 30px;
+        color: var(--muted);
+      }
+      .foot {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 22px;
+        margin-top: 22px;
+      }
+      .info {
+        padding: 24px;
+      }
+      .info h2 {
+        font-size: 13px;
+        margin: 0 0 12px;
+        font-weight: 600;
+      }
+      .info p,
+      .info dl {
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0;
+      }
+      .info dt {
+        float: left;
+        clear: left;
+        min-width: 82px;
+      }
+      .info dd {
+        margin-left: 90px;
+        overflow-wrap: anywhere;
+      }
+      .footer {
+        display: flex;
+        justify-content: space-between;
+        gap: 25px;
+        margin-top: 30px;
+        font-size: 11px;
+        color: var(--muted);
+      }
+      .sr {
+        position: absolute;
+        width: 1px;
+        height: 1px;
+        overflow: hidden;
+        clip: rect(0, 0, 0, 0);
+      }
+      .load {
+        display: none;
+        margin-bottom: 24px;
+        padding: 14px 18px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        background: #fff;
+        font-size: 13px;
+      }
+      .load label {
+        display: block;
+        margin-bottom: 8px;
+        font-weight: 600;
+      }
+      .load input {
+        max-width: 100%;
+      }
+      @media (max-width: 950px) {
+        .workspace {
+          grid-template-columns: 1fr 310px;
+        }
+        .shell {
+          padding: 24px;
+        }
+        .metric {
+          padding: 18px;
+        }
+        .hero {
+          display: block;
+        }
+        .run-status {
+          display: inline-flex;
+          margin-top: 24px;
+        }
+      }
+      @media (max-width: 720px) {
+        .workspace,
+        .foot {
+          grid-template-columns: 1fr;
+        }
+        .shell {
+          padding: 20px 16px 36px;
+        }
+        .top {
+          margin-bottom: 36px;
+        }
+        .top a {
+          display: none;
+        }
+        .hero {
+          margin-bottom: 24px;
+        }
+        h1 {
+          letter-spacing: -1.4px;
+        }
+        .metrics {
+          grid-template-columns: 1fr 1fr;
+        }
+        .metric:nth-child(2) {
+          border-right: 0;
+        }
+        .metric:nth-child(-n + 2) {
+          border-bottom: 1px solid var(--line);
+        }
+        .metric {
+          padding: 18px 20px;
+        }
+        .toolbar {
+          flex-wrap: wrap;
+          gap: 10px;
+        }
+        .row {
+          padding: 15px 16px;
+        }
+        .footer {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+      @media (prefers-reduced-transparency: reduce) {
+        .toolbar {
+          background: #edf2f7;
+          backdrop-filter: none;
+        }
+      }
+      @media (prefers-contrast: more) {
+        :root {
+          --muted: #243c53;
+          --line: #7a8d9f;
+        }
+        .toolbar {
+          background: #e9eff5;
+          backdrop-filter: none;
+        }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        * {
+          scroll-behavior: auto !important;
+          animation: none !important;
+          transition: none !important;
+        }
+      }
+      @media print {
+        .segmented,
+        .load,
+        .top a {
+          display: none;
+        }
+        .workspace {
+          grid-template-columns: 1fr;
+        }
+        .shell {
+          max-width: none;
+          padding: 0;
+        }
+        .panel {
+          box-shadow: none;
+        }
+        .row {
+          break-inside: avoid;
+        }
+      }
+      #rows {
+        max-height: 620px;
+        overflow-y: auto;
+      }
+      .detail {
+        position: sticky;
+        top: 20px;
+      }
+      .detail pre {
+        max-height: 280px;
+        overflow: auto;
+      }
+      .back {
+        display: none;
+      }
+      @media (max-width: 720px) {
+        .detail {
+          position: static;
+        }
+        .back {
+          display: block;
+          border: 1px solid var(--line);
+          border-radius: 7px;
+          background: #fff;
+          padding: 7px 10px;
+          margin-bottom: 20px;
+          color: var(--blue);
+        }
+        #rows {
+          max-height: 440px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="top">
+        <div class="brand">__LOGO__<span>rillprobe</span></div>
+        <span class="badge" id="mode">Contract report</span
+        ><a href="https://github.com/bglglzd/rillprobe"
+          >Source & documentation ↗</a
+        >
+      </header>
+      <div class="load" id="load">
+        <label for="report-file"
+          >View the saved synthetic sample, or open your own JSON report</label
+        ><input id="report-file" type="file" accept="application/json,.json" />
+        <p id="load-status" role="status">
+          Your file stays in this browser. Run the CLI to generate fresh
+          evidence.
+        </p>
+      </div>
+      <section class="hero">
+        <div>
+          <p class="eyebrow">AI gateway contract testing</p>
+          <h1 id="headline">Find the break.<br />Keep the evidence.</h1>
+          <p class="intro" id="intro">
+            Compare the direct route with the gateway. Inspect the first
+            divergence, then reproduce the case.
+          </p>
+        </div>
+        <div class="run-status">
+          <span class="dot" id="dot"></span
+          ><span id="status">Loading report</span>
+        </div>
+      </section>
+      <section class="metrics" aria-label="Run summary">
+        <div class="metric">
+          <strong id="fixtures">—</strong
+          ><span id="fixtures-label">named fixtures</span>
+        </div>
+        <div class="metric">
+          <strong id="passed">—</strong><span>checks passed</span>
+        </div>
+        <div class="metric red">
+          <strong id="failed">—</strong><span>contract failures</span>
+        </div>
+        <div class="metric">
+          <strong id="duration">—</strong
+          ><span id="duration-label">elapsed · seconds</span>
+        </div>
+      </section>
+      <div class="workspace">
+        <section class="panel" aria-labelledby="results-title">
+          <div class="toolbar">
+            <h2 id="results-title">Route comparison</h2>
+            <div class="segmented" role="group" aria-label="Filter checks">
+              <button data-filter="fail" aria-pressed="true">Failures</button
+              ><button data-filter="all" aria-pressed="false">All checks</button
+              ><button data-filter="pass" aria-pressed="false">Passed</button>
+            </div>
+          </div>
+          <div id="rows"></div>
+          <div class="note" id="explanation"></div>
+        </section>
+        <aside
+          class="panel detail"
+          id="detail"
+          aria-label="Selected check"
+          tabindex="-1"
+        ></aside>
+      </div>
+      <div class="foot">
+        <section class="panel info">
+          <h2>Execution record</h2>
+          <dl id="environment"></dl>
+        </section>
+        <section class="panel info">
+          <h2>Transport ≠ retrieval quality</h2>
+          <p id="quality"></p>
+        </section>
+      </div>
+      <footer class="footer">
+        <span>Evidence over assumptions.</span><span id="timestamp"></span>
+      </footer>
+    </main>
+    <script id="report-data" type="application/json">
+      __REPORT_DATA__
+    </script>
+    <script>
+      "use strict";
+      let report = JSON.parse(
+          document.getElementById("report-data").textContent,
+        ),
+        filter = "fail",
+        selected = null;
+      const $ = (id) => document.getElementById(id),
+        pretty = (x) => JSON.stringify(x, null, 2);
+      function text(tag, value, cls) {
+        const el = document.createElement(tag);
+        el.textContent = String(value ?? "");
+        if (cls) el.className = cls;
+        return el;
+      }
+      function block(title, value) {
+        $("detail").append(
+          text("h3", title),
+          text("pre", typeof value === "string" ? value : pretty(value)),
+        );
+      }
+      function select(row, fromUser = false) {
+        selected = row;
+        renderRows();
+        const d = $("detail");
+        d.replaceChildren();
+        const back = text("button", "← Back to checks", "back");
+        back.type = "button";
+        back.onclick = () => {
+          const b = [...$("rows").children].find(
+            (x) =>
+              x.dataset.key ===
+              row.case_id + "|" + row.route + "|" + (row.iteration ?? ""),
+          );
+          if (b) {
+            b.focus();
+            b.scrollIntoView({ block: "center" });
+          }
+        };
+        d.append(
+          back,
+          text(
+            "p",
+            row.status === "fail" ? "FIRST DIVERGENCE" : "CHECK DETAILS",
+            "eyebrow",
+          ),
+          text(
+            "h2",
+            row.code === "ok" ? row.case_id : row.code.replaceAll("_", " "),
+          ),
+        );
+        d.append(text("p", row.case_id + " · " + row.route));
+        const route = text("div", "", "route");
+        route.append(
+          text(
+            "span",
+            row.route === "live" ? "Live endpoint" : "Direct provider",
+          ),
+          text("b", "→"),
+          text(
+            "span",
+            row.route === "gateway"
+              ? "Gateway"
+              : row.status === "pass"
+                ? "Verified"
+                : "Observed",
+            row.status === "fail" ? "bad" : "",
+          ),
+        );
+        d.append(route);
+        block("Expected invariant", row.expected);
+        block("Actual result", row.actual);
+        if (row.input) block("Synthetic input", row.input);
+        block("Reproduce", row.reproduce);
+        if (row.seed) block("Injected defect", row.seed);
+        if (fromUser && matchMedia("(max-width:720px)").matches) {
+          d.focus({ preventScroll: true });
+          d.scrollIntoView({ block: "start" });
+        }
+      }
+      function renderRows() {
+        const holder = $("rows"),
+          focusKey = document.activeElement?.dataset.key,
+          scroll = holder.scrollTop;
+        holder.replaceChildren();
+        const list = report.rows.filter(
+          (r) => filter === "all" || r.status === filter,
+        );
+        if (!list.length)
+          holder.append(
+            text(
+              "p",
+              "No checks in this filter. Choose All checks to see the run.",
+              "empty",
+            ),
+          );
+        for (const row of list) {
+          const b = document.createElement("button");
+          b.type = "button";
+          b.className = "row";
+          b.dataset.key =
+            row.case_id + "|" + row.route + "|" + (row.iteration ?? "");
+          b.setAttribute("aria-pressed", String(selected === row));
+          b.append(
+            text(
+              "span",
+              row.status === "fail" ? "×" : "✓",
+              "symbol " + row.status,
+            ),
+          );
+          const name = text("span", "");
+          name.append(
+            text("span", row.case_id, "name"),
+            text("span", row.route + " · " + row.code, "sub"),
+          );
+          b.append(
+            name,
+            text(
+              "span",
+              row.status === "fail"
+                ? "Failed"
+                : row.expected_rejection
+                  ? "Rejected ✓"
+                  : "Passed",
+              "state " + row.status,
+            ),
+          );
+          b.onclick = () => select(row, true);
+          holder.append(b);
+          if (focusKey === b.dataset.key) b.focus({ preventScroll: true });
+        }
+        holder.scrollTop = scroll;
+      }
+      function render() {
+        const s = report.summary,
+          live = report.mode === "live";
+        $("mode").textContent = live ? "Live execution" : "Synthetic HTTP demo";
+        $("status").textContent = s.failed
+          ? s.failed + " contract failures"
+          : "All checked contracts passed";
+        $("dot").className = "dot" + (s.failed ? "" : " ok");
+        $("headline").textContent = s.failed
+          ? "Find the break. Keep the evidence."
+          : "Same contract. Clear passage.";
+        $("fixtures").textContent = report.fixture_count ?? s.checks;
+        $("fixtures-label").textContent = live
+          ? "live requests"
+          : "named fixtures";
+        $("passed").textContent = s.passed;
+        $("failed").textContent = s.failed;
+        $("duration").textContent = (
+          (s.duration_ms ??
+            report.rows.reduce((n, r) => n + r.duration_ms, 0)) / 1000
+        ).toFixed(2);
+        $("explanation").textContent = live
+          ? report.limits.join(" ")
+          : report.scenario === "seeded-faults"
+            ? s.detected_defects +
+              " of " +
+              s.seeded_defects +
+              " injected defects detected. Direct provider is the control. This demo performs no model inference."
+            : "The repaired synthetic gateway preserves the checked contracts. This demo performs no model inference.";
+        if (live)
+          $("intro").textContent =
+            "Observed endpoint behavior. A successful transport check does not certify model quality or untested capabilities.";
+        const env = $("environment");
+        env.replaceChildren();
+        for (const [k, v] of Object.entries({
+          ...report.environment,
+          ...(report.configuration ?? {}),
+        })) {
+          env.append(text("dt", k), text("dd", v));
+        }
+        const q = report.quality;
+        $("quality").textContent = q
+          ? "Synthetic lexical baseline · " +
+            q.queries +
+            " queries / " +
+            q.documents +
+            " documents. MRR " +
+            q.mean_mrr.toFixed(3) +
+            " · nDCG " +
+            q.mean_ndcg.toFixed(3) +
+            ". " +
+            q.note
+          : "No text-equality comparison or model leaderboard. Rerank quality, when selected, uses authored relevance labels and original document positions.";
+        $("timestamp").textContent = report.environment.timestamp;
+        filter = s.failed ? "fail" : "all";
+        document
+          .querySelectorAll("[data-filter]")
+          .forEach((b) =>
+            b.setAttribute("aria-pressed", String(b.dataset.filter === filter)),
+          );
+        select(report.rows.find((r) => r.status === "fail") ?? report.rows[0]);
+      }
+      document.querySelectorAll("[data-filter]").forEach(
+        (b) =>
+          (b.onclick = () => {
+            filter = b.dataset.filter;
+            document
+              .querySelectorAll("[data-filter]")
+              .forEach((x) => x.setAttribute("aria-pressed", String(x === b)));
+            const first = report.rows.find(
+              (r) => filter === "all" || r.status === filter,
+            );
+            if (first) select(first);
+            else {
+              selected = null;
+              renderRows();
+              $("detail").replaceChildren(
+                text("h2", "No checks in this filter"),
+                text("p", "Choose All checks to inspect the run."),
+              );
+            }
+          }),
+      );
+      if (
+        location.pathname.endsWith("index.html") ||
+        location.pathname.endsWith("/")
+      ) {
+        $("load").style.display = "block";
+      }
+      $("report-file").onchange = async (e) => {
+        const previous = report;
+        try {
+          const file = e.target.files[0];
+          if (!file) return;
+          if (file.size > 16 * 1024 * 1024)
+            throw Error("Report is larger than 16 MiB.");
+          const candidate = JSON.parse(await file.text());
+          const valid =
+            candidate.schema_version === 1 &&
+            ["synthetic", "live"].includes(candidate.mode) &&
+            Array.isArray(candidate.rows) &&
+            candidate.rows.length > 0 &&
+            candidate.rows.length <= 2000 &&
+            candidate.summary &&
+            candidate.environment &&
+            typeof candidate.environment.timestamp === "string" &&
+            candidate.rows.every(
+              (r) =>
+                ["pass", "fail"].includes(r.status) &&
+                ["case_id", "route", "code", "expected", "reproduce"].every(
+                  (k) => typeof r[k] === "string",
+                ) &&
+                Number.isFinite(r.duration_ms) &&
+                Object.hasOwn(r, "actual"),
+            );
+          if (
+            !valid ||
+            candidate.summary.checks !== candidate.rows.length ||
+            candidate.summary.passed !==
+              candidate.rows.filter((r) => r.status === "pass").length ||
+            candidate.summary.failed !==
+              candidate.rows.filter((r) => r.status === "fail").length
+          )
+            throw Error(
+              "Choose a Rillprobe v1 report with consistent result rows (maximum 2,000).",
+            );
+          report = candidate;
+          render();
+          $("load-status").textContent =
+            "Loaded " + file.name + ". The file stays in this browser.";
+        } catch (error) {
+          report = previous;
+          render();
+          $("load-status").textContent =
+            "Could not load report: " + error.message;
+        }
+      };
+      render();
+    </script>
+  </body>
+</html>
