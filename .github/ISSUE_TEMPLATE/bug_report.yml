@@ -1,0 +1,17 @@
+name: Contract failure
+description: Report a reproducible contract or installation defect
+body:
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Reproduce
+      description: Sanitized command, fixture ID, Python version and operating system. Do not include credentials.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: Expected and actual result
+      description: Include the invariant and sanitized observed result. Review reports for private content before sharing.
+    validations:
+      required: true
