@@ -11,6 +11,7 @@ from unittest.mock import patch
 from rillprobe.cli import main
 from rillprobe.report import write_report
 from rillprobe.runner import demo, probe
+from rillprobe.sse import SSEDecoder
 
 
 class Provider(BaseHTTPRequestHandler):
@@ -87,12 +88,21 @@ class ReviewRegressions(unittest.TestCase):
 
     def test_malformed_url_is_configuration_error_without_traceback(self):
         for url in ('http://[::1/v1', 'http://localhost:999999/v1', ' http://localhost/v1',
-                    'http://bad host/v1', 'http://bad\x1bhost/v1'):
+                    'http://bad host/v1', 'http://bad\x1bhost/v1', 'http://bad\u009bhost/v1'):
             with self.subTest(url=url), contextlib.redirect_stderr(io.StringIO()) as output:
                 code = main(['probe', '--base-url', url, '--model', 'synthetic'])
             self.assertEqual(code, 2)
             self.assertIn('invalid_endpoint', output.getvalue())
             self.assertNotIn('Traceback', output.getvalue())
+
+    def test_large_single_line_survives_fragmented_input(self):
+        decoder = SSEDecoder()
+        data = 'a' * (1024 * 1024)
+        wire = ('data: ' + data + '\r\n\r\n').encode()
+        actual = []
+        for start in range(0, len(wire), 8191):
+            actual.extend(decoder.feed(wire[start:start + 8191]))
+        self.assertEqual(actual, [('message', data)])
 
     def test_unrelated_failure_does_not_count_as_detected_seed(self):
         def wrong_failure(base, route, case, **kwargs):

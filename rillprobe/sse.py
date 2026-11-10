@@ -12,7 +12,7 @@ MAX_BYTES = 8 * 1024 * 1024
 class SSEDecoder:
     def __init__(self):
         self.decoder = codecs.getincrementaldecoder("utf-8-sig")("strict")
-        self.line = ""
+        self.line = []
         self.data = []
         self.event_type = "message"
         self.after_cr = False
@@ -33,13 +33,13 @@ class SSEDecoder:
                 continue
             self.after_cr = False
             if char in "\r\n":
-                event = self._line(self.line)
-                self.line = ""
+                event = self._line("".join(self.line))
+                self.line = []
                 self.after_cr = char == "\r"
                 if event is not None:
                     events.append(event)
             else:
-                self.line += char
+                self.line.append(char)
         # SSE does not dispatch an event without a blank terminating line.
         return events
 
@@ -65,6 +65,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
     decoder = SSEDecoder()
     state = {"text": "", "tools": {}, "finish_reason": None, "done": False, "events": 0,
              "reported_models": []}
+    text_fragments = []
 
     def accept(event):
         event_type, data = event
@@ -101,7 +102,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
         if content is not None:
             if not isinstance(content, str):
                 raise ContractError("invalid_content", "Content delta must be a string or null")
-            state["text"] += content
+            text_fragments.append(content)
         calls = delta.get("tool_calls", [])
         if not isinstance(calls, list):
             raise ContractError("invalid_tool", "tool_calls must be an array")
@@ -111,7 +112,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
             index = call.get("index")
             if type(index) is not int or not 0 <= index < 128:
                 raise ContractError("invalid_tool", "Tool index must be an integer from 0 to 127")
-            tool = state["tools"].setdefault(index, {"id": "", "name": "", "arguments": ""})
+            tool = state["tools"].setdefault(index, {"id": [], "name": [], "arguments": []})
             function = call.get("function", {})
             if not isinstance(function, dict):
                 raise ContractError("invalid_tool", "Tool function must be an object")
@@ -119,7 +120,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
                                ("arguments", function.get("arguments", ""))):
                 if not isinstance(value, str):
                     raise ContractError("invalid_tool", "Tool fragments must be strings")
-                tool[key] += value
+                tool[key].append(value)
         finish = choice.get("finish_reason")
         if finish is not None:
             if finish not in ("stop", "tool_calls"):
@@ -138,6 +139,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
     tools = []
     tool_ids = set()
     for index, tool in sorted(state["tools"].items()):
+        tool = {key: "".join(fragments) for key, fragments in tool.items()}
         if not tool["id"] or not tool["name"]:
             raise ContractError("invalid_tool", "Tool call needs a nonempty ID and function name")
         if tool["id"] in tool_ids:
@@ -152,4 +154,5 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
         tools.append({"index": index, **tool, "parsed_arguments": arguments})
     if bool(tools) != (state["finish_reason"] == "tool_calls"):
         raise ContractError("tool_finish", "Tool calls and finish reason disagree")
+    state["text"] = "".join(text_fragments)
     return {**state, "tools": tools}
