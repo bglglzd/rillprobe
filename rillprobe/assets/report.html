@@ -340,6 +340,21 @@
         grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
         gap: 4px 16px;
       }
+      .limits {
+        margin-top: 16px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+      }
+      .limits summary {
+        cursor: pointer;
+        font-size: 12px;
+      }
+      .limits ul {
+        padding-left: 18px;
+        margin-bottom: 0;
+        font-size: 12px;
+        color: var(--muted);
+      }
       .foot.single {
         grid-template-columns: 1fr;
       }
@@ -557,6 +572,10 @@
         <section class="panel info">
           <h2>Execution record</h2>
           <dl id="environment"></dl>
+          <details class="limits" id="limits-panel">
+            <summary>Limits</summary>
+            <ul id="limits-list"></ul>
+          </details>
         </section>
         <section class="panel info" id="quality-panel">
           <h2>Retrieval metrics</h2>
@@ -631,7 +650,7 @@
             row.route === "gateway"
               ? "Gateway"
               : row.status === "pass"
-                ? "Verified"
+                ? "Passed"
                 : "Observed",
             row.status === "fail" ? "bad" : "",
           ),
@@ -737,12 +756,26 @@
           env.append(
             text(
               "dt",
-              k === "server_version" ? "server_version (supplied)" : k,
+              k === "server_version" && v !== "not independently supplied"
+                ? "server_version (supplied)"
+                : k,
             ),
             text("dd", v),
           );
         }
         const q = report.quality;
+        const limits = [
+          ...new Set(
+            [
+              ...(Array.isArray(report.limits) ? report.limits : []),
+              ...(typeof q?.note === "string" ? [q.note] : []),
+            ].filter((value) => typeof value === "string" && value.length),
+          ),
+        ];
+        $("limits-list").replaceChildren(
+          ...limits.map((value) => text("li", value)),
+        );
+        $("limits-panel").hidden = !limits.length;
         $("quality-panel").hidden = !q;
         $("run-details").classList.toggle("single", !q);
         $("quality").textContent = q

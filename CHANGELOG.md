@@ -5,6 +5,7 @@
 - Replaced report slogans with a working title and removed the introductory copy, duplicate status chip and footer.
 - Removed the unused retrieval panel from chat reports; row-level retrieval metrics remain available when present.
 - Labelled the operator-supplied runtime version in the report.
+- Kept scope and dataset limitations in a compact Limits disclosure.
 
 ## 0.1.0
 
