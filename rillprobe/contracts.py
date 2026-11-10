@@ -19,9 +19,18 @@ def parse_json(value):
         raise ValueError("Nonfinite constant")
 
     try:
-        return json.loads(value, parse_float=finite_float, parse_constant=reject_constant)
+        parsed = json.loads(value, parse_float=finite_float, parse_constant=reject_constant)
     except (ValueError, TypeError, RecursionError) as exc:
         raise ContractError("invalid_json", "Response data must be valid finite JSON") from exc
+    pending = [(parsed, 0)]
+    while pending:
+        item, depth = pending.pop()
+        if isinstance(item, (dict, list)):
+            if depth >= 64:
+                raise ContractError("json_nesting", "JSON exceeds the supported 64 container levels")
+            values = item.values() if isinstance(item, dict) else item
+            pending.extend((child, depth + 1) for child in values)
+    return parsed
 
 
 def compare_text(actual: str, expected: str, policy="preserve"):

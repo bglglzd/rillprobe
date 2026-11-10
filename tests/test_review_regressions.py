@@ -75,8 +75,19 @@ class ReviewRegressions(unittest.TestCase):
             self.assertEqual(target.requests, 1)
             self.assertEqual(proxy.requests, 0)
 
+    def test_deep_metadata_with_credential_is_bounded_before_redaction(self):
+        with provider() as (server, url):
+            server.number = '[' * 600 + '0' + ']' * 600
+            with patch.dict(os.environ, {'RILLPROBE_TEST_KEY': 'synthetic-depth-key'}):
+                result = probe(url, 'synthetic', kind='rerank', key_env='RILLPROBE_TEST_KEY')
+            self.assertEqual(result['summary']['failed'], 5)
+            self.assertTrue(all(row['code'] == 'json_nesting' for row in result['rows']))
+            with tempfile.TemporaryDirectory() as directory:
+                write_report(result, directory)
+
     def test_malformed_url_is_configuration_error_without_traceback(self):
-        for url in ('http://[::1/v1', 'http://localhost:999999/v1', ' http://localhost/v1'):
+        for url in ('http://[::1/v1', 'http://localhost:999999/v1', ' http://localhost/v1',
+                    'http://bad host/v1', 'http://bad\x1bhost/v1'):
             with self.subTest(url=url), contextlib.redirect_stderr(io.StringIO()) as output:
                 code = main(['probe', '--base-url', url, '--model', 'synthetic'])
             self.assertEqual(code, 2)

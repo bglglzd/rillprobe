@@ -28,7 +28,7 @@ def endpoint_url(base):
         _ = parts.port
     except ValueError as exc:
         raise ContractError("invalid_endpoint", "Endpoint has an invalid host or port") from exc
-    if base != base.strip() or any(char in base for char in "\r\n\t"):
+    if any(char.isspace() or ord(char) < 32 or ord(char) == 127 for char in base):
         raise ContractError("invalid_endpoint", "Endpoint must not contain whitespace control characters")
     if parts.scheme not in ("http", "https") or not parts.hostname or parts.username or parts.password:
         raise ContractError("invalid_endpoint", "Use an http(s) URL without embedded credentials")
