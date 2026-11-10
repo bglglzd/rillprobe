@@ -1,5 +1,7 @@
 # Contributing
 
+Use functional interface copy. Labels and text should describe an action, result, state, configuration or necessary limitation. Do not add slogans, promotional headlines or redundant descriptions.
+
 Start with a reproducible fixture and the observable expected invariant. Keep transport correctness separate from semantic quality. Synthetic inputs must contain no private data or credentials.
 
 Use Python 3.11+, install `requirements-dev.txt`, then run the unittest, Ruff and build commands in the README. Include a failing case and recovery evidence for behavior changes. Preserve original document positions even when texts repeat. State endpoint/model/runtime and scope for live observations; do not infer live compatibility from mocks.

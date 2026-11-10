@@ -2,9 +2,7 @@
 
 # Rillprobe
 
-AI gateway contract testing for Unicode, SSE streams and rerank source indices. Compare a direct provider route with a gateway, find the first broken invariant, and keep a reproducible report.
-
-Rillprobe is a small Python CLI with no runtime dependencies. It checks wire behavior separately from retrieval quality. It does not score the wording of model answers.
+Rillprobe checks Unicode, SSE streaming and rerank source indices on direct-provider and gateway routes. It produces JSON and HTML reports. Python 3.11+, no runtime dependencies.
 
 ![Actual synthetic report showing eight detected gateway defects](docs/report-desktop.png)
 

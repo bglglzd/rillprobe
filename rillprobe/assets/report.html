@@ -57,7 +57,7 @@
         align-items: center;
         justify-content: space-between;
         gap: 20px;
-        margin-bottom: 58px;
+        margin-bottom: 28px;
       }
       .brand {
         display: flex;
@@ -95,45 +95,19 @@
         margin: 0 0 12px;
       }
       h1 {
-        font-size: clamp(32px, 4.5vw, 52px);
+        font-size: clamp(28px, 3vw, 36px);
         font-weight: 550;
         line-height: 1.12;
-        letter-spacing: -2px;
-        margin: 0 0 18px;
-        max-width: 780px;
-      }
-      .intro {
-        color: var(--muted);
-        max-width: 640px;
+        letter-spacing: -0.8px;
         margin: 0;
-        font-size: 16px;
+        max-width: 780px;
       }
       .hero {
         display: flex;
         justify-content: space-between;
         gap: 32px;
         align-items: flex-end;
-        margin-bottom: 34px;
-      }
-      .run-status {
-        display: flex;
-        align-items: center;
-        gap: 9px;
-        font-size: 13px;
-        white-space: nowrap;
-        background: #fff;
-        border: 1px solid var(--line);
-        border-radius: 30px;
-        padding: 10px 15px;
-      }
-      .dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--red);
-      }
-      .dot.ok {
-        background: var(--green);
+        margin-bottom: 16px;
       }
       .metrics {
         display: grid;
@@ -353,21 +327,21 @@
         margin: 0;
       }
       .info dt {
-        float: left;
-        clear: left;
-        min-width: 82px;
-      }
-      .info dd {
-        margin-left: 90px;
+        min-width: 0;
         overflow-wrap: anywhere;
       }
-      .footer {
-        display: flex;
-        justify-content: space-between;
-        gap: 25px;
-        margin-top: 30px;
-        font-size: 11px;
-        color: var(--muted);
+      .info dd {
+        margin: 0;
+        min-width: 0;
+        overflow-wrap: anywhere;
+      }
+      .info dl {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) minmax(0, 2fr);
+        gap: 4px 16px;
+      }
+      .foot.single {
+        grid-template-columns: 1fr;
       }
       .sr {
         position: absolute;
@@ -406,10 +380,6 @@
         .hero {
           display: block;
         }
-        .run-status {
-          display: inline-flex;
-          margin-top: 24px;
-        }
       }
       @media (max-width: 720px) {
         .workspace,
@@ -420,16 +390,16 @@
           padding: 20px 16px 36px;
         }
         .top {
-          margin-bottom: 36px;
+          margin-bottom: 24px;
         }
         .top a {
           display: none;
         }
         .hero {
-          margin-bottom: 24px;
+          margin-bottom: 16px;
         }
         h1 {
-          letter-spacing: -1.4px;
+          letter-spacing: -0.8px;
         }
         .metrics {
           grid-template-columns: 1fr 1fr;
@@ -449,10 +419,6 @@
         }
         .row {
           padding: 15px 16px;
-        }
-        .footer {
-          flex-direction: column;
-          gap: 8px;
         }
       }
       @media (prefers-reduced-transparency: reduce) {
@@ -542,27 +508,14 @@
         >
       </header>
       <div class="load" id="load">
-        <label for="report-file"
-          >View the saved synthetic sample, or open your own JSON report</label
+        <label for="report-file">Import JSON report</label
         ><input id="report-file" type="file" accept="application/json,.json" />
         <p id="load-status" role="status">
-          Your file stays in this browser. Run the CLI to generate fresh
-          evidence.
+          Saved sample. Imported files stay in this browser.
         </p>
       </div>
       <section class="hero">
-        <div>
-          <p class="eyebrow">AI gateway contract testing</p>
-          <h1 id="headline">Find the break.<br />Keep the evidence.</h1>
-          <p class="intro" id="intro">
-            Compare the direct route with the gateway. Inspect the first
-            divergence, then reproduce the case.
-          </p>
-        </div>
-        <div class="run-status">
-          <span class="dot" id="dot"></span
-          ><span id="status">Loading report</span>
-        </div>
+        <h1 id="headline">Contract report</h1>
       </section>
       <section class="metrics" aria-label="Run summary">
         <div class="metric">
@@ -583,7 +536,7 @@
       <div class="workspace">
         <section class="panel" aria-labelledby="results-title">
           <div class="toolbar">
-            <h2 id="results-title">Route comparison</h2>
+            <h2 id="results-title">Checks</h2>
             <div class="segmented" role="group" aria-label="Filter checks">
               <button data-filter="fail" aria-pressed="true">Failures</button
               ><button data-filter="all" aria-pressed="false">All checks</button
@@ -600,19 +553,16 @@
           tabindex="-1"
         ></aside>
       </div>
-      <div class="foot">
+      <div class="foot" id="run-details">
         <section class="panel info">
           <h2>Execution record</h2>
           <dl id="environment"></dl>
         </section>
-        <section class="panel info">
-          <h2>Transport ≠ retrieval quality</h2>
+        <section class="panel info" id="quality-panel">
+          <h2>Retrieval metrics</h2>
           <p id="quality"></p>
         </section>
       </div>
-      <footer class="footer">
-        <span>Evidence over assumptions.</span><span id="timestamp"></span>
-      </footer>
     </main>
     <script id="report-data" type="application/json">
       __REPORT_DATA__
@@ -689,6 +639,7 @@
         d.append(route);
         block("Expected invariant", row.expected);
         block("Actual result", row.actual);
+        if (row.quality) block("Retrieval metrics", row.quality);
         if (row.input) block("Synthetic input", row.input);
         block("Reproduce", row.reproduce);
         if (row.seed) block("Injected defect", row.seed);
@@ -754,43 +705,46 @@
         const s = report.summary,
           live = report.mode === "live";
         $("mode").textContent = live ? "Live execution" : "Synthetic HTTP demo";
-        $("status").textContent = s.failed
-          ? s.failed + (s.failed === 1 ? " contract failure" : " contract failures")
-          : "All checked contracts passed";
-        $("dot").className = "dot" + (s.failed ? "" : " ok");
-        $("headline").textContent = s.failed
-          ? "Find the break. Keep the evidence."
-          : "Same contract. Clear passage.";
+        $("headline").textContent = live
+          ? "Live contract report"
+          : "Contract report";
         $("fixtures").textContent = report.fixture_count ?? s.checks;
         $("fixtures-label").textContent = live
           ? "live requests"
           : "named fixtures";
         $("passed").textContent = s.passed;
         $("failed").textContent = s.failed;
+        $("failed").parentElement.classList.toggle("red", s.failed > 0);
         $("duration").textContent = (
           (s.duration_ms ??
             report.rows.reduce((n, r) => n + r.duration_ms, 0)) / 1000
         ).toFixed(2);
         $("explanation").textContent = live
-          ? report.limits.join(" ")
+          ? "Checked capability: " + report.scenario + "."
           : report.scenario === "seeded-faults"
-            ? s.detected_defects +
-              " of " +
+            ? "Injected defects: " +
+              s.detected_defects +
+              "/" +
               s.seeded_defects +
-              " injected defects detected. Direct provider is the control. This demo performs no model inference."
-            : "The repaired synthetic gateway preserves the checked contracts. This demo performs no model inference.";
-        if (live)
-          $("intro").textContent =
-            "Observed endpoint behavior. A successful transport check does not certify model quality or untested capabilities.";
+              " detected. No model inference."
+            : "Synthetic providers; no model inference.";
         const env = $("environment");
         env.replaceChildren();
         for (const [k, v] of Object.entries({
           ...report.environment,
           ...(report.configuration ?? {}),
         })) {
-          env.append(text("dt", k), text("dd", v));
+          env.append(
+            text(
+              "dt",
+              k === "server_version" ? "server_version (supplied)" : k,
+            ),
+            text("dd", v),
+          );
         }
         const q = report.quality;
+        $("quality-panel").hidden = !q;
+        $("run-details").classList.toggle("single", !q);
         $("quality").textContent = q
           ? "Synthetic lexical baseline · " +
             q.queries +
@@ -800,10 +754,8 @@
             q.mean_mrr.toFixed(3) +
             " · nDCG " +
             q.mean_ndcg.toFixed(3) +
-            ". " +
-            q.note
-          : "No text-equality comparison or model leaderboard. Rerank quality, when selected, uses authored relevance labels and original document positions.";
-        $("timestamp").textContent = report.environment.timestamp;
+            "."
+          : "";
         filter = s.failed ? "fail" : "all";
         document
           .querySelectorAll("[data-filter]")
