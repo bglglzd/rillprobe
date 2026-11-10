@@ -32,7 +32,7 @@ The repaired gateway exits **0**. Exit **2** means a configuration or output err
 
 ## What it checks
 
-- **Text:** JSON escaping, Cyrillic, emoji, combining marks, explicit preserve/NFC policy, and UTF-8 split across byte boundaries.
+- **Text:** JSON escaping, Cyrillic, emoji, combining marks, and UTF-8 split across byte boundaries. CLI fixtures preserve text exactly; the tested Python helper `compare_text(..., policy="nfc")` also supports NFC comparison.
 - **SSE chat:** CR/LF/CRLF framing, multiline data, comments, BOM, usage-only chunks, fragmented tool arguments, explicit errors, cancellation and truncation. A successful stream needs a successful finish reason and `[DONE]`.
 - **Rerank:** original positions, duplicate documents, `top_n`, empty input, finite descending scores and returned-document correspondence. Different models need not share a score scale.
 - **Quality:** MRR and nDCG use authored relevance labels and original indices. The bundled five-query, twenty-document lexical baseline is synthetic; it is not a model benchmark or evidence of customer results.
@@ -48,7 +48,7 @@ rillprobe probe --base-url http://127.0.0.1:8080/v1 \
   --model your-loaded-model --repeat 3 --output reports/live
 ```
 
-On PowerShell, put the command on one line instead of using shell backslashes. For an authenticated endpoint, add `--key-env RILLPROBE_API_KEY`, where that environment variable already contains your key. Never put credentials in the URL or command argument. Credentials require HTTPS except on loopback. Redirects are refused. Reports omit request authentication headers and redact the supplied key if an endpoint reflects it. Treat reports as data from your endpoint before sharing them.
+On PowerShell, put the command on one line instead of using shell backslashes. For an authenticated endpoint, add `--key-env RILLPROBE_API_KEY`, where that environment variable already contains your key. Never put credentials in the URL or command argument. Credentials require HTTPS except on loopback. Loopback requests bypass inherited HTTP proxies; remote endpoints use the standard proxy environment. Redirects are refused. Reports omit request authentication headers and redact the supplied key if an endpoint reflects it. Treat reports as data from your endpoint before sharing them.
 
 For an endpoint supporting the Cohere-style/LiteLLM `rerank` response shape, use `--kind rerank`; this runs the small labelled corpus and reports transport and quality separately. The adapter is implemented, but **no real reranking service has been verified for v0.1**. A chat pass does not certify reranking, live tool calling, a particular gateway version or every API provider. [Verified scope](docs/verification.md) records the actual exercised runtime. Use `--server-version` to record an independently obtained runtime version; it is labelled as supplied metadata, not discovered by the tool.
 

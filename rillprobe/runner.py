@@ -1,5 +1,6 @@
 import json
 import http.client
+import ipaddress
 import os
 import platform
 import time
@@ -9,9 +10,9 @@ import urllib.request
 from datetime import datetime, timezone
 
 from . import __version__
-from .contracts import compare_text, retrieval_metrics, validate_rerank
+from .contracts import compare_text, parse_json, retrieval_metrics, validate_rerank
 from .errors import ContractError
-from .fixtures import CASES, CORPUS, SEEDS
+from .fixtures import CASES, CORPUS, SEEDS, SEED_RULES
 from .sandbox import sandbox
 from .sse import MAX_BYTES, parse_chat
 
@@ -22,7 +23,13 @@ class NoRedirect(urllib.request.HTTPRedirectHandler):
 
 
 def endpoint_url(base):
-    parts = urllib.parse.urlsplit(base)
+    try:
+        parts = urllib.parse.urlsplit(base)
+        _ = parts.port
+    except ValueError as exc:
+        raise ContractError("invalid_endpoint", "Endpoint has an invalid host or port") from exc
+    if base != base.strip() or any(char in base for char in "\r\n\t"):
+        raise ContractError("invalid_endpoint", "Endpoint must not contain whitespace control characters")
     if parts.scheme not in ("http", "https") or not parts.hostname or parts.username or parts.password:
         raise ContractError("invalid_endpoint", "Use an http(s) URL without embedded credentials")
     if parts.query or parts.fragment:
@@ -30,11 +37,24 @@ def endpoint_url(base):
     return base.rstrip("/")
 
 
+def is_loopback(host):
+    if host and host.rstrip(".").lower() == "localhost":
+        return True
+    try:
+        return ipaddress.ip_address(host).is_loopback
+    except ValueError:
+        return False
+
+
 def post(url, payload, headers=None, timeout=20):
     request = urllib.request.Request(endpoint_url(url), json.dumps(payload, ensure_ascii=False).encode(),
                                      {"Content-Type": "application/json", **(headers or {})})
     try:
-        return urllib.request.build_opener(NoRedirect).open(request, timeout=timeout)
+        handlers = [NoRedirect]
+        if is_loopback(urllib.parse.urlsplit(url).hostname):
+            # A loopback HTTP credential must never leave the host via an inherited proxy.
+            handlers.append(urllib.request.ProxyHandler({}))
+        return urllib.request.build_opener(*handlers).open(request, timeout=timeout)
     except urllib.error.HTTPError as exc:
         raise ContractError("http_error", f"Endpoint returned HTTP {exc.code}") from exc
     except (urllib.error.URLError, TimeoutError, OSError) as exc:
@@ -73,11 +93,11 @@ def _expected(case):
     return "Preserve unique original positions, top_n, finite descending scores and document correspondence"
 
 
-def run_case(base, route, case):
+def run_case(base, route, case, seeded=False):
     start = time.perf_counter()
     result = {"case_id": case["id"], "route": route, "kind": case["kind"], "expected": _expected(case),
               "input": {k: case[k] for k in ("text", "documents", "top_n", "tool_args") if k in case},
-              "seed": SEEDS.get(case["id"]) if route == "gateway" else None,
+              "seed": SEEDS.get(case["id"]) if route == "gateway" and seeded else None,
               "reproduce": f"rillprobe demo --case {case['id']}"}
     try:
         endpoint = "chat/completions" if case["kind"] == "stream" else "rerank"
@@ -95,7 +115,7 @@ def run_case(base, route, case):
                                                 actual["tools"][0]["parsed_arguments"] != case["expected_tool"]):
                     raise ContractError("tool_mismatch", "Tool arguments do not preserve the synthetic input")
             else:
-                actual = json.loads(response.read(MAX_BYTES + 1))
+                actual = parse_json(response.read(MAX_BYTES + 1))
                 validated = validate_rerank(actual, case["documents"], case["top_n"])
                 if [r["index"] for r in validated] != case["order"][:case["top_n"]]:
                     raise ContractError("index_correspondence", "Source order differs from the declared fixture")
@@ -116,16 +136,18 @@ def demo(fixed=False, case_id=None):
     cases = [CASES[case_id]] if case_id else list(CASES.values())
     started = time.perf_counter()
     with sandbox(broken=not fixed) as base:
-        rows = [run_case(base, route, case) for case in cases for route in ("direct", "gateway")]
+        rows = [run_case(base, route, case, seeded=not fixed) for case in cases for route in ("direct", "gateway")]
     failed = [row for row in rows if row["status"] == "fail"]
     expected_seeds = {case["id"] for case in cases if case["id"] in SEEDS} if not fixed else set()
-    detected = {row["case_id"] for row in failed if row["route"] == "gateway"}
+    detected = {row["case_id"] for row in failed if row["route"] == "gateway" and
+                row["code"] == SEED_RULES.get(row["case_id"])}
     return {"schema_version": 1, "mode": "synthetic", "scenario": "repaired" if fixed else "seeded-faults",
             "environment": environment(), "fixture_count": len(cases), "rows": rows,
             "summary": {"checks": len(rows), "passed": len(rows) - len(failed), "failed": len(failed),
                         "seeded_defects": len(expected_seeds), "detected_defects": len(detected & expected_seeds),
                         "unexpected_failures": len([r for r in failed if r["route"] == "direct" or
-                                                    r["case_id"] not in expected_seeds]),
+                                                    r["case_id"] not in expected_seeds or
+                                                    r["code"] != SEED_RULES.get(r["case_id"])]),
                         "duration_ms": round((time.perf_counter() - started) * 1000, 2)},
             "quality": evaluate_demo_quality(),
             "limits": ["Synthetic HTTP simulation; no model inference.",
@@ -157,7 +179,7 @@ def probe(base_url, model, kind="chat", repeat=1, key_env=None, timeout=30, serv
         if not token:
             raise ContractError("missing_key", "The named credential environment variable is empty")
         parts = urllib.parse.urlsplit(base)
-        if parts.scheme != "https" and parts.hostname not in ("localhost", "127.0.0.1", "::1"):
+        if parts.scheme != "https" and not is_loopback(parts.hostname):
             raise ContractError("insecure_endpoint", "Credentials require HTTPS or a loopback endpoint")
         headers["Authorization"] = "Bearer " + token
     rows = []
@@ -187,7 +209,7 @@ def probe(base_url, model, kind="chat", repeat=1, key_env=None, timeout=30, serv
                         raw = response.read(MAX_BYTES + 1)
                         if len(raw) > MAX_BYTES:
                             raise ContractError("response_limit", "Response exceeds the 8 MiB limit")
-                        actual = json.loads(raw)
+                        actual = parse_json(raw)
                         ranked = validate_rerank(actual, case["documents"], len(case["documents"]))
                         row["quality"] = retrieval_metrics([r["index"] for r in ranked], case["relevance"])
                 row.update(status="pass", code="ok", actual=actual)

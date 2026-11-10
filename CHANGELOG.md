@@ -6,3 +6,4 @@
 - Added eight isolated fault seeds, repaired-route comparison and reproducible JSON/HTML reports.
 - Added a static saved-sample viewer and a separate live chat/rerank HTTP adapter.
 - Kept retrieval metrics separate from protocol outcomes and documented the verified scope.
+- Rejected nonfinite response metadata, kept loopback credentials off inherited proxies, and bound seed detection to the expected failure rule.

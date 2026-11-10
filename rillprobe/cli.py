@@ -35,12 +35,13 @@ def main(argv=None):
             report = probe(args.base_url, args.model, args.kind, args.repeat, args.key_env,
                            args.timeout, args.server_version)
         write_report(report, args.output)
-    except (ContractError, OSError) as exc:
+    except (ContractError, OSError, ValueError) as exc:
         print(f"rillprobe: {getattr(exc, 'code', 'output_error')}: {exc}", file=sys.stderr)
         return 2
     summary = report["summary"]
+    failure_word = "failure" if summary["failed"] == 1 else "failures"
     print(f"{report['mode']} / {report['scenario']}: {summary['passed']}/{summary['checks']} checks passed; "
-          f"{summary['failed']} failures. Report: {args.output}/report.html")
+          f"{summary['failed']} {failure_word}. Report: {args.output}/report.html")
     if report["mode"] == "synthetic" and not args.fixed:
         print(f"Injected defects detected: {summary['detected_defects']}/{summary['seeded_defects']}. "
               "Exit 1 is expected for this deliberately broken gateway.")

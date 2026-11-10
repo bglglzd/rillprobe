@@ -30,7 +30,8 @@ class Handler(BaseHTTPRequestHandler):
             url = f"http://127.0.0.1:{self.server.server_port}/direct/" + "/".join(parts[1:])
             request = urllib.request.Request(url, body, {"Content-Type": "application/json",
                                                        "X-Rillprobe-Case": case["id"]})
-            with urllib.request.urlopen(request, timeout=5) as response:
+            opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+            with opener.open(request, timeout=5) as response:
                 wire = response.read()
         else:
             wire = (stream_wire(case) if case["kind"] == "stream" else

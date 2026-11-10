@@ -61,6 +61,11 @@ SEEDS = {
     "reject-explicit": "swallow_provider_error", "rank-duplicates": "rebuild_duplicate_index",
     "rank-top-one": "ignore_top_n", "rank-signed": "nonfinite_score",
 }
+SEED_RULES = {
+    "text-emoji": "text_mismatch", "text-literal-escape": "text_mismatch", "frame-crlf": "truncated",
+    "tool-nested": "invalid_tool_json", "reject-explicit": "missing_expected_error",
+    "rank-duplicates": "duplicate_index", "rank-top-one": "cardinality", "rank-signed": "invalid_json",
+}
 
 
 def stream_wire(case, broken=False):

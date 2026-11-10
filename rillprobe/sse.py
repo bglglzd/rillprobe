@@ -1,11 +1,10 @@
 """Incremental SSE framing and a deliberately narrow chat-completions contract."""
 
 import codecs
-import json
-import math
 from collections.abc import Iterable
 
 from .errors import ContractError
+from .contracts import parse_json
 
 MAX_BYTES = 8 * 1024 * 1024
 
@@ -62,20 +61,6 @@ class SSEDecoder:
         return None
 
 
-def _json(value):
-    def finite_float(text):
-        parsed = float(text)
-        if not math.isfinite(parsed):
-            raise ValueError("Nonfinite number")
-        return parsed
-
-    try:
-        return json.loads(value, parse_float=finite_float,
-                          parse_constant=lambda _: (_ for _ in ()).throw(ValueError()))
-    except (ValueError, TypeError) as exc:
-        raise ContractError("invalid_json", "Event data must be valid finite JSON") from exc
-
-
 def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict:
     decoder = SSEDecoder()
     state = {"text": "", "tools": {}, "finish_reason": None, "done": False, "events": 0,
@@ -93,7 +78,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
                 raise ContractError("missing_finish", "[DONE] arrived without a finish reason")
             state["done"] = True
             return
-        payload = _json(data)
+        payload = parse_json(data)
         if event_type == "error" or (isinstance(payload, dict) and "error" in payload):
             raise ContractError("remote_error", "Provider returned an explicit error event")
         if not isinstance(payload, dict) or not isinstance(payload.get("choices"), list):
@@ -159,7 +144,7 @@ def parse_chat(chunks: Iterable[bytes], cancel_after: int | None = None) -> dict
             raise ContractError("duplicate_tool_id", "Each tool call must have a distinct ID")
         tool_ids.add(tool["id"])
         try:
-            arguments = _json(tool["arguments"])
+            arguments = parse_json(tool["arguments"])
         except ContractError as exc:
             raise ContractError("invalid_tool_json", "Assembled tool arguments are not valid JSON") from exc
         if not isinstance(arguments, dict):

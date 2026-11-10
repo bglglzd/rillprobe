@@ -1,9 +1,27 @@
 """Deterministic invariants; retrieval quality is measured separately."""
 
+import json
 import math
 import unicodedata
 
 from .errors import ContractError
+
+
+def parse_json(value):
+    """Reject nonfinite values anywhere, including unvalidated response metadata."""
+    def finite_float(text):
+        parsed = float(text)
+        if not math.isfinite(parsed):
+            raise ValueError("Nonfinite number")
+        return parsed
+
+    def reject_constant(_):
+        raise ValueError("Nonfinite constant")
+
+    try:
+        return json.loads(value, parse_float=finite_float, parse_constant=reject_constant)
+    except (ValueError, TypeError, RecursionError) as exc:
+        raise ContractError("invalid_json", "Response data must be valid finite JSON") from exc
 
 
 def compare_text(actual: str, expected: str, policy="preserve"):

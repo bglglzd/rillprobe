@@ -755,7 +755,7 @@
           live = report.mode === "live";
         $("mode").textContent = live ? "Live execution" : "Synthetic HTTP demo";
         $("status").textContent = s.failed
-          ? s.failed + " contract failures"
+          ? s.failed + (s.failed === 1 ? " contract failure" : " contract failures")
           : "All checked contracts passed";
         $("dot").className = "dot" + (s.failed ? "" : " ok");
         $("headline").textContent = s.failed
